@@ -549,27 +549,30 @@ resource "kubernetes_secret" "tls_secret" {
 
 
 resource "helm_release" "backstage" {
-  count = local.build_backstage ? 1 : 0
-  depends_on = [ kubernetes_secret.tls_secret ]
+  count      = local.build_backstage ? 1 : 0
+  depends_on = [kubernetes_secret.tls_secret]
   name       = "backstage"
   repository = "oci://oowcontainerimages.azurecr.io/helm"
   chart      = "backstagechart"
   version    = "0.1.0"
+  namespace  = kubernetes_namespace.backstage_nammespace[count.index].metadata[0].name
 
   set {
     name  = "image.repository"
     value = "oowcontainerimages.azurecr.io/backstage"
   }
-    set {
+
+  set {
     name  = "image.tag"
     value = "v2"
   }
-    set {
+
+  set {
     name  = "env.K8S_CLUSTER_NAME"
     value = module.aks.aks_name
   }
 
-      set {
+  set {
     name  = "env.K8S_CLUSTER_URL"
     value = "https://${module.aks.aks_name}"
   }
@@ -579,13 +582,13 @@ resource "helm_release" "backstage" {
     value = kubernetes_secret.backstage_service_account_secret[count.index].data.token
   }
 
-    set {
+  set {
     name  = "env.GITHUB_TOKEN"
     value = local.github_token
   }
 
   set {
-    name = "env.GITOPS_REPO"
+    name  = "env.GITOPS_REPO"
     value = local.gitops_addons_url
   }
 
@@ -593,6 +596,7 @@ resource "helm_release" "backstage" {
     name  = "service.type"
     value = "LoadBalancer"
   }
+
   set {
     name  = "service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-resource-group"
     value = module.aks.node_resource_group
@@ -601,10 +605,6 @@ resource "helm_release" "backstage" {
   set {
     name  = "service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4"
     value = azurerm_public_ip.backstage_public_ip[count.index].ip_address
-  }
-  set {
-    name  = "image.tag"
-    value = "v1"
   }
 
   set {
@@ -651,11 +651,12 @@ resource "helm_release" "backstage" {
     name  = "env.AZURE_TENANT_ID"
     value = data.azurerm_client_config.current.tenant_id
   }
-    set {
+
+  set {
     name  = "podAnnotations.backstage\\.io/kubernetes-id"
     value = "${module.aks.aks_name}-component"
   }
-  
+
   set {
     name  = "labels.kubernetesId"
     value = "${module.aks.aks_name}-component"

@@ -109,7 +109,7 @@ module "network" {
 ################################################################################
 resource "azurerm_postgresql_flexible_server" "backstagedbserver" {
   count                         = local.build_backstage ? 1 : 0
-  name                          = "backstage-postgresql-server"
+  name                          = "aks-backstage-postgresql-server"
   location                      = var.location
   public_network_access_enabled = true
   administrator_password        = var.postgres_password
@@ -254,6 +254,10 @@ resource "azuread_application" "backstage-app" {
   count        = local.build_backstage ? 1 : 0
   display_name = "Backstage"
 
+  owners = [
+    data.azurerm_client_config.current.object_id
+  ]
+
   app_role {
     id                   = uuid() # Generate a unique ID for the role
     allowed_member_types = ["User"]
@@ -330,6 +334,7 @@ resource "azuread_application_redirect_uris" "backstage_redirect_uri" {
 resource "azuread_service_principal" "backstage-app-sp" {
   count     = local.build_backstage ? 1 : 0
   client_id = azuread_application.backstage-app[count.index].client_id
+  owners    = azuread_application.backstage-app[count.index].owners
 }
 
 # Define the service principal password

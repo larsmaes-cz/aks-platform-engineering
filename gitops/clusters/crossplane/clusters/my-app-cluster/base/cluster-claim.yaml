@@ -72,13 +72,13 @@ spec:
       provisionedBy: Crossplane
   resourceGroup:
     tags:
-      createdWith: "Terraform"
-      pattern: "GitOpsBridge"
-      omgeving: "ontw"
-      eigenaar: "Lars Maes"
-      contact: "lars.maes@cz.nl"
-      divisie: "it en data"
-      afdeling: "tech enablement"
-      team: "Azure Cloud Enablement"
-      keten: "Platform Engineering"
-      applicatie: "AKS Platform Engineering"
+      createdWith: Terraform
+      pattern: GitOpsBridge
+      omgeving: ontw
+      eigenaar: Lars Maes
+      contact: lars.maes@cz.nl
+      divisie: it en data
+      afdeling: tech enablement
+      team: Azure Cloud Enablement
+      keten: Platform Engineering
+      applicatie: AKS Platform Engineering

@@ -331,11 +331,14 @@ spec:
             chart:
               name: argo-cd
               repository: https://argoproj.github.io/argo-helm
-              version:  '{{metadata.labels.argocd_chart_version}}'
+              version: "7.8.25"
             namespace: argocd
           providerConfigRef:
             name: helm-provider	
       patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.labels.argocd_chart_version
+          toFieldPath: spec.forProvider.chart.version
         - type: FromCompositeFieldPath
           fromFieldPath: metadata.name
           toFieldPath: spec.providerConfigRef.name                 

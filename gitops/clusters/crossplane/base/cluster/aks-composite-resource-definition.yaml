@@ -338,6 +338,8 @@ spec:
                 type: object
                 properties:
                   tags:
+                    additionalProperties:
+                      type: string
                     type: object
                     description: specifies the tags for the virtual network                  
             required:

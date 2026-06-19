@@ -10,7 +10,7 @@ spec:
     name: my-app-cluster-stage-secret    
   location: "EastUs"
   aks:
-    adminUser: #<<Insert Here: Object Id of the User>>
+    adminUser: 6191885f-33f4-4a62-8e58-b7e4aec173af
     tags:
       environment: stage
   virtualNetwork:

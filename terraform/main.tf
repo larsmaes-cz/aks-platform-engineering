@@ -118,6 +118,12 @@ resource "azurerm_postgresql_flexible_server" "backstagedbserver" {
   sku_name                      = "GP_Standard_D4s_v3"
   version                       = "12"
   zone                          = 1
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 # Define the PostgreSQL database
@@ -206,6 +212,11 @@ resource "azurerm_user_assigned_identity" "akspe" {
   name                = "akspe"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 resource "azurerm_role_assignment" "akspe_role_assignment" {
@@ -259,7 +270,7 @@ resource "azuread_application" "backstage-app" {
   ]
 
   app_role {
-    id                   = uuid() # Generate a unique ID for the role
+    id                   = "5177c939-17f7-291a-7f67-97e793ab817d" # Generate a unique ID for the role
     allowed_member_types = ["User"]
     description          = "Allows the app to read the profile of signed-in users."
     display_name         = "User.Read"
@@ -267,7 +278,7 @@ resource "azuread_application" "backstage-app" {
   }
 
   app_role {
-    id                   = uuid() # Generate a unique ID for the role
+    id                   = "69514611-e1d8-bc3b-70ee-941395660b4c" # Generate a unique ID for the role
     allowed_member_types = ["User"]
     description          = "Allows the app to read all users' full profiles."
     display_name         = "User.Read.All"
@@ -275,7 +286,7 @@ resource "azuread_application" "backstage-app" {
   }
 
   app_role {
-    id                   = uuid() # Generate a unique ID for the role
+    id                   = "ff11a882-c2c9-0296-b3b5-a7d4e329b804" # Generate a unique ID for the role
     allowed_member_types = ["User"]
     description          = "Allows the app to read the memberships of all groups."
     display_name         = "GroupMember.Read.All"
@@ -319,6 +330,12 @@ resource "azuread_application" "backstage-app" {
       id   = "37f7f235-527c-4136-accd-4a02d197296e" # openid
       type = "Scope"
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      web
+    ]
   }
 }
 
@@ -390,6 +407,11 @@ resource "azurerm_public_ip" "backstage_public_ip" {
   resource_group_name = module.aks.node_resource_group
   allocation_method   = "Static"
   sku                 = "Standard"
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 
 ################################################################################
@@ -433,7 +455,51 @@ resource "kubernetes_role" "backstage_pod_reader" {
       "events",
       "pods/log",
       "pods/status",
+      "deployments",
+
     ]
+    verbs = ["get", "list", "watch"]
+  }
+}
+
+resource "kubernetes_cluster_role" "backstage_cluster_reader" {
+  count      = local.build_backstage ? 1 : 0
+  depends_on = [kubernetes_service_account.backstage_service_account]
+  metadata {
+    name = "backstage-cluster-reader"
+  }
+
+  rule {
+    api_groups = ["*"]
+    resources = [
+      "pods",
+      "pods/log",
+      "configmaps",
+      "services",
+      "deployments",
+      "replicasets",
+      "horizontalpodautoscalers",
+      "ingresses",
+      "statefulsets",
+      "limitranges",
+      "resourcequotas",
+      "daemonsets"
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = ["batch"]
+    resources = [
+      "jobs",
+      "cronjobs"
+    ]
+    verbs = ["get", "list", "watch"]
+  }
+      
+  rule {
+    api_groups = ["metrics.k8s.io"]
+    resources = ["pods"]
     verbs = ["get", "list", "watch"]
   }
 }
@@ -450,6 +516,26 @@ resource "kubernetes_role_binding" "backstage_role_binding" {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Role"
     name      = kubernetes_role.backstage_pod_reader[count.index].metadata[0].name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.backstage_service_account[count.index].metadata[0].name
+    namespace = kubernetes_service_account.backstage_service_account[count.index].metadata[0].namespace
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "backstage_role_binding" {
+  count      = local.build_backstage ? 1 : 0
+  depends_on = [kubernetes_cluster_role.backstage_cluster_reader]
+  metadata {
+    name      = "backstage-cluster-role-binding"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.backstage_cluster_reader[count.index].metadata[0].name
   }
 
   subject {
@@ -564,12 +650,12 @@ resource "helm_release" "backstage" {
 
   set {
     name  = "image.repository"
-    value = "oowcontainerimages.azurecr.io/backstage"
+    value = "aksbackstageacr.azurecr.io/backstage"
   }
 
   set {
     name  = "image.tag"
-    value = "v2"
+    value = "latest"
   }
 
   set {
@@ -579,7 +665,7 @@ resource "helm_release" "backstage" {
 
   set {
     name  = "env.K8S_CLUSTER_URL"
-    value = "https://${module.aks.aks_name}"
+    value = "https://${module.aks.cluster_fqdn}"
   }
 
   set {

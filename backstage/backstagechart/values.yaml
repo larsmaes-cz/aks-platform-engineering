@@ -23,7 +23,7 @@ env:
 replicaCount: 1
 
 image:
-  repository: <oowcontainerimages.azurecr.io/backstage>
+  repository: <aksbackstageacr.azurecr.io/backstage>
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: <tag>

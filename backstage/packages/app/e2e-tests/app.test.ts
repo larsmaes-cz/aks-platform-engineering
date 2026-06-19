@@ -19,5 +19,15 @@ import { test, expect } from '@playwright/test';
 test('App should render the welcome page', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page.getByText('My Company Catalog')).toBeVisible();
+  const enterButton = page.getByRole('button', { name: 'Enter' });
+  await expect(enterButton).toBeVisible();
+  await enterButton.click();
+
+  const nav = page.getByRole('navigation');
+  await expect(
+    nav.getByRole('link', { name: 'Catalog', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'APIs', exact: true }),
+  ).toBeVisible();
 });

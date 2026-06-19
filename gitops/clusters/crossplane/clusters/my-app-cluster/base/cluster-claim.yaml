@@ -44,6 +44,14 @@ spec:
     tags:
       environment: Test
       provisionedBy: Crossplane
+      omgeving: ontw
+      eigenaar: Lars Maes
+      contact: lars.maes@cz.nl
+      divisie: it en data
+      afdeling: tech enablement
+      team: Azure Cloud Enablement
+      keten: Platform Engineering
+      applicatie: AKS Platform Engineering
   userNodePool:
     name: user
     vmSize: Standard_B2s
@@ -58,6 +66,15 @@ spec:
     osDiskType: Managed
     osSku: AzureLinux
     osType: Linux
+    tags:
+      omgeving: ontw
+      eigenaar: Lars Maes
+      contact: lars.maes@cz.nl
+      divisie: it en data
+      afdeling: tech enablement
+      team: Azure Cloud Enablement
+      keten: Platform Engineering
+      applicatie: AKS Platform Engineering
   subnet:
     name: MainSubnet
     privateEndpointNetworkPoliciesEnabled: true
@@ -70,6 +87,14 @@ spec:
     tags:
       environment: Test
       provisionedBy: Crossplane
+      omgeving: ontw
+      eigenaar: Lars Maes
+      contact: lars.maes@cz.nl
+      divisie: it en data
+      afdeling: tech enablement
+      team: Azure Cloud Enablement
+      keten: Platform Engineering
+      applicatie: AKS Platform Engineering
   resourceGroup:
     tags:
       createdWith: Terraform

@@ -1,0 +1,151 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: Deploy-Storage-Account
+  title: Provision an Azure Storage Account
+  description: This template provisions an Azure Storage Account using Crossplane.
+spec:
+  owner: lars.maes@cz.nl
+  type: service
+
+  parameters:
+    - title: Storage Account Configuration
+      required:
+        - name
+        - location
+        - resourceGroupName
+      properties:
+        name:
+          title: Storage Account Name
+          type: string
+          description: Unique name for the storage account (3-24 chars, lowercase letters and numbers only).
+          ui:autofocus: true
+        location:
+          title: Azure Region
+          type: string
+          description: The Azure region where the storage account will be created.
+          default: eastus
+          enum:
+            - eastus
+            - eastus2
+            - westus
+            - westus2
+            - westeurope
+            - northeurope
+            - southeastasia
+        resourceGroupName:
+          title: Resource Group Name
+          type: string
+          description: The name of the resource group to deploy into.
+        accountTier:
+          title: Account Tier
+          type: string
+          description: The performance tier of the storage account.
+          default: Standard
+          enum:
+            - Standard
+            - Premium
+        accountReplicationType:
+          title: Replication Type
+          type: string
+          description: The replication strategy for the storage account.
+          default: LRS
+          enum:
+            - LRS
+            - GRS
+            - RAGRS
+            - ZRS
+            - GZRS
+            - RAGZRS
+        accessTier:
+          title: Access Tier
+          type: string
+          description: The access tier for the storage account.
+          default: Hot
+          enum:
+            - Hot
+            - Cool
+    - title: GitOps Repository Details
+      required:
+        - argoRepoUrl
+        - commitMessage
+      properties:
+        argoRepoUrl:
+          title: GitOps Repository Location
+          type: string
+          description: The URL of your control repository for GitOps (ArgoCD).
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+        commitMessage:
+          title: Commit Message
+          type: string
+          description: The commit message for this storage account request.
+          default: 'Request new storage account'
+
+  steps:
+    - id: fetch-remote
+      name: Fetch Remote Repo
+      action: fetch:plain
+      input:
+        url: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo }}.git
+        targetPath: ./my-app
+
+    - id: add-content
+      name: Add Storage Account Claim
+      action: fetch:template
+      input:
+        url: ./content
+        targetPath: ./my-app
+        values:
+          name: ${{ parameters.name }}
+          location: ${{ parameters.location }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          accountTier: ${{ parameters.accountTier }}
+          accountReplicationType: ${{ parameters.accountReplicationType }}
+          accessTier: ${{ parameters.accessTier }}
+
+    - id: rename-claim
+      name: Rename Storage Account Claim
+      action: fs:rename
+      input:
+        files:
+          - from: ./my-app/gitops/clusters/crossplane/storage/storage-claim.yaml
+            to: ./my-app/gitops/clusters/crossplane/storage/${{ parameters.name }}-claim.yaml
+
+    - id: update-kustomization
+      name: Add claim to storage kustomization
+      action: fs:append
+      input:
+        file: ./my-app/gitops/clusters/crossplane/storage/kustomization.yaml
+        content: |
+            - ${{ parameters.name }}-claim.yaml
+
+    - id: push-to-github
+      name: Create PR to provision Storage Account
+      action: publish:github:pull-request
+      input:
+        title: "Backstage PR: Provision storage account ${{ parameters.name }}"
+        description: "This PR provisions a new Azure Storage Account named ${{ parameters.name }} in ${{ parameters.location }}."
+        repoUrl: ${{ parameters.argoRepoUrl }}
+        commitMessage: ${{ parameters.commitMessage }}
+        sourcePath: ./my-app
+        branchName: backstage-storage-${{ parameters.name }}
+        update: true
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo }}
+        catalogInfoPath: '/blob/backstage-storage-${{ parameters.name }}/catalog-info.yaml'
+        optional: true
+
+  output:
+    links:
+      - title: PR URL
+        url: ${{ steps['push-to-github'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

@@ -102,9 +102,9 @@ catalog:
       rules:
         - allow: [Template]
 
-      # Deploy App to K8s Example
+      # Deploy Templates
     - type: file
-      target: ./template-cluster/template.yaml
+      target: ./templates/*/template.yaml
       rules:
         - allow: [Template]
 

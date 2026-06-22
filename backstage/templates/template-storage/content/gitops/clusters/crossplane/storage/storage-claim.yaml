@@ -1,0 +1,16 @@
+apiVersion: storage.example.com/v1alpha1
+kind: StorageAccountClaim
+metadata:
+  name: ${{ values.name }}
+  namespace: crossplane-system
+spec:
+  location: ${{ values.location }}
+  resourceGroupName: ${{ values.resourceGroupName }}
+  storageAccount:
+    accountTier: ${{ values.accountTier }}
+    accountReplicationType: ${{ values.accountReplicationType }}
+    accountKind: StorageV2
+    accessTier: ${{ values.accessTier }}
+    minTlsVersion: TLS1_2
+    httpsTrafficOnlyEnabled: true
+    allowBlobPublicAccess: false

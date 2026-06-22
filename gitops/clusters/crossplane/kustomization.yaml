@@ -1,4 +1,5 @@
 resources:
   - base/cluster
   - base/storage
+  - storage
   # - clusters/my-app-cluster

@@ -59,7 +59,7 @@ spec:
       action: fs:delete
       input:
         files:
-          - ./my-app/gitops/clusters/crossplane/storage/catalog-info.yaml
+          - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}/catalog-info.yaml
 
     - id: update-kustomization
       name: Remove claim from storage kustomization

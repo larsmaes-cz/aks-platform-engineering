@@ -171,6 +171,8 @@ spec:
         files:
           - from: ./my-app/gitops/clusters/crossplane/storage/storage-claim.yaml
             to: ./my-app/gitops/clusters/crossplane/storage/${{ parameters.name }}-claim.yaml
+          - from: ./my-app/gitops/clusters/crossplane/storage/account
+            to: ./my-app/gitops/clusters/crossplane/storage/${{ parameters.name }}
 
     - id: update-kustomization
       name: Add claim to storage kustomization
@@ -199,7 +201,7 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo }}
-        catalogInfoPath: '/blob/backstage-storage-${{ parameters.name }}/gitops/clusters/crossplane/storage/catalog-info.yaml'
+        catalogInfoPath: '/blob/backstage-storage-${{ parameters.name }}/gitops/clusters/crossplane/storage/${{ parameters.name }}/catalog-info.yaml'
         optional: true
 
   output:

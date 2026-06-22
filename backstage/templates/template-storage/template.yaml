@@ -20,6 +20,9 @@ spec:
           type: string
           description: Unique name for the storage account (3-24 chars, lowercase letters and numbers only).
           ui:autofocus: true
+          minLength: 3
+          maxLength: 24
+          pattern: '^[a-z0-9]+$'
         location:
           title: Azure Region
           type: string

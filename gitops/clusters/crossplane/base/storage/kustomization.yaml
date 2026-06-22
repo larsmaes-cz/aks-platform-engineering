@@ -1,0 +1,4 @@
+---
+resources:
+  - sa-composite-resource-definition.yaml
+  - sa-composition.yaml

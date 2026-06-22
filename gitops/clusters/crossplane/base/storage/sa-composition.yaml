@@ -1,0 +1,92 @@
+
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: storage-account
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  patchSets:
+    - name: location-patch
+      patches:
+      - type: FromCompositeFieldPath
+        fromFieldPath: spec.location
+        toFieldPath: spec.forProvider.location
+    - name: metadata-patch
+      patches:
+      - type: FromCompositeFieldPath
+        fromFieldPath: metadata.annotations
+        toFieldPath: metadata.annotations
+  resources:
+    - name: storage-account
+      base:
+        apiVersion: storage.azure.upbound.io/v1beta1
+        kind: Account
+        spec:
+          forProvider:
+            resourceGroupNameSelector:
+              matchControllerRef: true
+            accountTier: Standard
+            accountReplicationType: LRS
+            accountKind: StorageV2
+            accessTier: Hot
+            minTlsVersion: TLS1_2
+            enableHttpsTrafficOnly: true
+            publicNetworkAccessEnabled: true
+            allowNestedItemsToBePublic: false
+      patches:
+        - type: PatchSet
+          patchSetName: location-patch
+        - type: PatchSet
+          patchSetName: metadata-patch
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.accountTier
+          toFieldPath: spec.forProvider.accountTier
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.accountReplicationType
+          toFieldPath: spec.forProvider.accountReplicationType
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.accountKind
+          toFieldPath: spec.forProvider.accountKind
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.accessTier
+          toFieldPath: spec.forProvider.accessTier
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.minTlsVersion
+          toFieldPath: spec.forProvider.minTlsVersion
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.httpsTrafficOnlyEnabled
+          toFieldPath: spec.forProvider.enableHttpsTrafficOnly
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.publicNetworkAccessEnabled
+          toFieldPath: spec.forProvider.publicNetworkAccessEnabled
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.allowBlobPublicAccess
+          toFieldPath: spec.forProvider.allowNestedItemsToBePublic
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.tags
+          toFieldPath: spec.forProvider.tags
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.id
+          toFieldPath: status.atProvider.storageAccountId
+        - type: ToCompositeFieldPath
+          fromFieldPath: status.atProvider.primaryBlobEndpoint
+          toFieldPath: status.atProvider.primaryBlobEndpoint
+    - name: resource-group
+      base:
+        apiVersion: azure.upbound.io/v1beta1
+        kind: ResourceGroup
+        spec:
+          forProvider: {}
+      patches:
+        - type: PatchSet
+          patchSetName: location-patch
+        - type: PatchSet
+          patchSetName: metadata-patch
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.resourceGroupName
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
+  compositeTypeRef:
+    apiVersion: storage.example.com/v1alpha1
+    kind: XStorageAccount

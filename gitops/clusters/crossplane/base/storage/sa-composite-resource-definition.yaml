@@ -1,0 +1,135 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xstorageaccounts.storage.example.com
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  group: storage.example.com
+  names:
+    kind: XStorageAccount
+    plural: xstorageaccounts
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              location:
+                type: string
+                description: specifies the Azure region for the storage account
+              resourceGroupName:
+                type: string
+                description: specifies the name of the resource group
+              storageAccount:
+                type: object
+                properties:
+                  accountTier:
+                    type: string
+                    description: specifies the performance tier of the storage account
+                    enum:
+                      - Standard
+                      - Premium
+                    default: Standard
+                  accountReplicationType:
+                    type: string
+                    description: specifies the replication strategy for the storage account
+                    enum:
+                      - LRS
+                      - GRS
+                      - RAGRS
+                      - ZRS
+                      - GZRS
+                      - RAGZRS
+                    default: LRS
+                  accountKind:
+                    type: string
+                    description: specifies the kind of the storage account
+                    enum:
+                      - BlobStorage
+                      - BlockBlobStorage
+                      - FileStorage
+                      - Storage
+                      - StorageV2
+                    default: StorageV2
+                  accessTier:
+                    type: string
+                    description: specifies the access tier for BlobStorage and StorageV2 accounts
+                    enum:
+                      - Hot
+                      - Cool
+                    default: Hot
+                  minTlsVersion:
+                    type: string
+                    description: specifies the minimum supported TLS version
+                    enum:
+                      - TLS1_0
+                      - TLS1_1
+                      - TLS1_2
+                    default: TLS1_2
+                  httpsTrafficOnlyEnabled:
+                    type: boolean
+                    description: specifies whether only HTTPS traffic is allowed
+                    default: true
+                  publicNetworkAccessEnabled:
+                    type: boolean
+                    description: specifies whether public network access is enabled
+                    default: true
+                  allowBlobPublicAccess:
+                    type: boolean
+                    description: specifies whether public access to blobs is allowed
+                    default: false
+                  tags:
+                    type: object
+                    description: specifies the tags for the storage account
+                    additionalProperties:
+                      type: string
+                required:
+                  - accountTier
+                  - accountReplicationType
+              containers:
+                type: array
+                description: specifies the blob containers to create in the storage account
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: specifies the name of the blob container
+                    containerAccessType:
+                      type: string
+                      description: specifies the access level for the container
+                      enum:
+                        - blob
+                        - container
+                        - private
+                      default: private
+                  required:
+                    - name
+            required:
+              - location
+              - resourceGroupName
+              - storageAccount
+          status:
+            description: Property bag for resource IDs.
+            properties:
+              atProvider:
+                description: keeps the state for the external resource
+                properties:
+                  storageAccountId:
+                    description: Azure resource ID of the storage account
+                    type: string
+                  primaryBlobEndpoint:
+                    description: the endpoint URL for blob storage
+                    type: string
+                type: object
+            type: object
+    served: true
+    referenceable: true
+  claimNames:
+    kind: StorageAccountClaim
+    plural: storageaccountclaims

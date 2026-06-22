@@ -1,0 +1,85 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: Delete-Storage-Account
+  title: Delete an Azure Storage Account
+  description: This template removes a Storage Account claim, triggering Crossplane to delete the Azure resource.
+spec:
+  owner: lars.maes@cz.nl
+  type: service
+
+  parameters:
+    - title: Storage Account to Delete
+      required:
+        - entity
+      properties:
+        entity:
+          title: Storage Account
+          type: string
+          description: Select the storage account to delete.
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind: Resource
+              spec.type: storage
+    - title: GitOps Repository Details
+      required:
+        - argoRepoUrl
+      properties:
+        argoRepoUrl:
+          title: GitOps Repository Location
+          type: string
+          description: The URL of your control repository for GitOps (ArgoCD).
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: fetch-remote
+      name: Fetch Remote Repo
+      action: fetch:plain
+      input:
+        url: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo }}.git
+        targetPath: ./my-app
+
+    - id: delete-claim
+      name: Delete Storage Account Claim
+      action: fs:delete
+      input:
+        files:
+          - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}-claim.yaml
+
+    - id: delete-catalog-info
+      name: Delete catalog-info for storage account
+      action: fs:delete
+      input:
+        files:
+          - ./my-app/gitops/clusters/crossplane/storage/catalog-info.yaml
+
+    - id: update-kustomization
+      name: Remove claim from storage kustomization
+      action: roadiehq:utils:fs:replace
+      input:
+        files:
+          - file: ./my-app/gitops/clusters/crossplane/storage/kustomization.yaml
+            find: ".*${{ (parameters.entity | parseEntityRef).name }}-claim.yaml\\n?"
+            replaceWith: ""
+            matchRegex: true
+
+    - id: push-to-github
+      name: Create PR to delete Storage Account
+      action: publish:github:pull-request
+      input:
+        title: "Backstage PR: Delete storage account ${{ (parameters.entity | parseEntityRef).name }}"
+        description: "This PR removes the Storage Account claim for ${{ (parameters.entity | parseEntityRef).name }}. Once merged, ArgoCD will sync and Crossplane will delete the Azure resource."
+        repoUrl: ${{ parameters.argoRepoUrl }}
+        commitMessage: "Delete storage account ${{ (parameters.entity | parseEntityRef).name }}"
+        sourcePath: ./my-app
+        branchName: backstage-delete-storage-${{ (parameters.entity | parseEntityRef).name }}
+        update: true
+
+  output:
+    links:
+      - title: PR URL
+        url: ${{ steps['push-to-github'].output.remoteUrl }}

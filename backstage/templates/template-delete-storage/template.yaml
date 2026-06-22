@@ -34,6 +34,10 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
+            allowedOwners:
+              - larsmaes-cz
+            allowedRepos:
+              - aks-platform-engineering
 
   steps:
     - id: fetch-remote

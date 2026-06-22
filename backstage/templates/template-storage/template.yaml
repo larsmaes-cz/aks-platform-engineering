@@ -124,6 +124,10 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
+            allowedOwners:
+              - larsmaes-cz
+            allowedRepos:
+              - aks-platform-engineering
         commitMessage:
           title: Commit Message
           type: string

@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: salars12441234
+  description: Azure Storage Account provisioned via Crossplane
+  annotations:
+    backstage.io/managed-by-location: "file:./gitops/clusters/crossplane/storage/salars12441234-claim.yaml"
+spec:
+  type: storage
+  owner: lars.maes@cz.nl
+  lifecycle: production

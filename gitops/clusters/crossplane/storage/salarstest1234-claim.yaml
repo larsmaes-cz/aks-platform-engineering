@@ -1,0 +1,16 @@
+apiVersion: storage.example.com/v1alpha1
+kind: StorageAccountClaim
+metadata:
+  name: salarstest1234
+  namespace: crossplane-system
+spec:
+  location: westeurope
+  resourceGroupName: rg-lars-test-storage
+  storageAccount:
+    accountTier: Standard
+    accountReplicationType: LRS
+    accountKind: StorageV2
+    accessTier: Hot
+    minTlsVersion: TLS1_2
+    httpsTrafficOnlyEnabled: true
+    allowBlobPublicAccess: false

@@ -87,6 +87,9 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.resourceGroupName
           toFieldPath: metadata.annotations[crossplane.io/external-name]
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.storageAccount.tags
+          toFieldPath: spec.forProvider.tags
   compositeTypeRef:
     apiVersion: storage.example.com/v1alpha1
     kind: XStorageAccount

@@ -65,6 +65,49 @@ spec:
           enum:
             - Hot
             - Cool
+    - title: Organisatie gegevens
+      required:
+        - omgeving
+        - eigenaar
+        - contact
+        - divisie
+        - afdeling
+        - team
+        - keten
+        - applicatie
+      properties:
+        omgeving:
+          title: Omgeving
+          type: string
+          description: De omgeving waar het storage account wordt ingezet.
+        eigenaar:
+          title: Eigenaar
+          type: string
+          description: De eigenaar van het storage account.
+        contact:
+          title: Contact
+          type: string
+          description: Contactpersoon voor het storage account.
+        divisie:
+          title: Divisie
+          type: string
+          description: De divisie waartoe het storage account behoort.
+        afdeling:
+          title: Afdeling
+          type: string
+          description: De afdeling waartoe het storage account behoort.
+        team:
+          title: Team
+          type: string
+          description: Het team dat verantwoordelijk is voor het storage account.
+        keten:
+          title: Keten
+          type: string
+          description: De keten waartoe het storage account behoort.
+        applicatie:
+          title: Applicatie
+          type: string
+          description: De applicatie waarvoor het storage account wordt gebruikt.
     - title: GitOps Repository Details
       required:
         - argoRepoUrl
@@ -105,6 +148,14 @@ spec:
           accountTier: ${{ parameters.accountTier }}
           accountReplicationType: ${{ parameters.accountReplicationType }}
           accessTier: ${{ parameters.accessTier }}
+          omgeving: ${{ parameters.omgeving }}
+          eigenaar: ${{ parameters.eigenaar }}
+          contact: ${{ parameters.contact }}
+          divisie: ${{ parameters.divisie }}
+          afdeling: ${{ parameters.afdeling }}
+          team: ${{ parameters.team }}
+          keten: ${{ parameters.keten }}
+          applicatie: ${{ parameters.applicatie }}
 
     - id: rename-claim
       name: Rename Storage Account Claim
@@ -139,7 +190,7 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo }}
-        catalogInfoPath: '/blob/backstage-storage-${{ parameters.name }}/catalog-info.yaml'
+        catalogInfoPath: '/blob/backstage-storage-${{ parameters.name }}/gitops/clusters/crossplane/storage/catalog-info.yaml'
         optional: true
 
   output:

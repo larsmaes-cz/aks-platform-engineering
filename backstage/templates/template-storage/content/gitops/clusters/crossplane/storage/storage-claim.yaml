@@ -14,3 +14,12 @@ spec:
     minTlsVersion: TLS1_2
     httpsTrafficOnlyEnabled: true
     allowBlobPublicAccess: false
+    tags:
+      omgeving: ${{ values.omgeving }}
+      eigenaar: ${{ values.eigenaar }}
+      contact: ${{ values.contact }}
+      divisie: ${{ values.divisie }}
+      afdeling: ${{ values.afdeling }}
+      team: ${{ values.team }}
+      keten: ${{ values.keten }}
+      applicatie: ${{ values.applicatie }}

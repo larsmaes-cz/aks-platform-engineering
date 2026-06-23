@@ -68,7 +68,7 @@ spec:
         files:
           - file: ./my-app/gitops/clusters/crossplane/storage/kustomization.yaml
             find: "- ${{ (parameters.entity | parseEntityRef).name }}-claim.yaml"
-            replaceWith: ""
+            replace: ""
 
     - id: push-to-github
       name: Create PR to delete Storage Account

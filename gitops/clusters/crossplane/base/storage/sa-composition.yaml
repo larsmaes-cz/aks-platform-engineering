@@ -36,13 +36,13 @@ spec:
             publicNetworkAccessEnabled: true
             allowNestedItemsToBePublic: false
       patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: metadata.labels[crossplane.io/claim-name]
-          toFieldPath: metadata.annotations[crossplane.io/external-name]
         - type: PatchSet
           patchSetName: location-patch
         - type: PatchSet
           patchSetName: metadata-patch
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.labels[crossplane.io/claim-name]
+          toFieldPath: metadata.annotations[crossplane.io/external-name]
         - type: FromCompositeFieldPath
           fromFieldPath: spec.storageAccount.accountTier
           toFieldPath: spec.forProvider.accountTier

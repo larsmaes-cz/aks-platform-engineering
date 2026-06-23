@@ -5,26 +5,17 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  generators:
-  - clusters:
-      selector:
-        matchLabels:
-          environment: control-plane
-  template:
-    metadata:
-      name: storage-claims
-    spec:
-      source:
-        repoURL: https://github.com/larsmaes-cz/aks-platform-engineering.git
-        targetRevision: main
-        path: gitops/clusters/crossplane/storage
-        directory:
-          recurse: false
-      destination:
-        name: '{{name}}'
-        namespace: workload
-      syncPolicy:
-        automated:
-          prune: true
-        syncOptions:
-          - CreateNamespace=true
+  source:
+    repoURL: https://github.com/larsmaes-cz/aks-platform-engineering.git
+    targetRevision: main
+    path: gitops/clusters/crossplane/storage
+    directory:
+      recurse: false
+  destination:
+    server: gitops-aks
+    namespace: crossplane-system
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true

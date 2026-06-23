@@ -61,14 +61,14 @@ spec:
         files:
           - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}/catalog-info.yaml
 
-    - id: update-kustomization
-      name: Remove claim from storage kustomization
-      action: roadiehq:utils:fs:replace
-      input:
-        files:
-          - file: ./my-app/gitops/clusters/crossplane/storage/kustomization.yaml
-            find: "- ${{ (parameters.entity | parseEntityRef).name }}-claim.yaml\n"
-            replaceWith: " "
+    # - id: update-kustomization
+    #   name: Remove claim from storage kustomization
+    #   action: roadiehq:utils:fs:replace
+    #   input:
+    #     files:
+    #       - file: ./my-app/gitops/clusters/crossplane/storage/kustomization.yaml
+    #         find: "- ${{ (parameters.entity | parseEntityRef).name }}-claim.yaml\n"
+    #         replaceWith: " "
 
     - id: push-to-github
       name: Create PR to delete Storage Account

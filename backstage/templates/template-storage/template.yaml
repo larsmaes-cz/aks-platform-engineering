@@ -174,15 +174,15 @@ spec:
           - from: ./my-app/gitops/clusters/crossplane/storage/account
             to: ./my-app/gitops/clusters/crossplane/storage/${{ parameters.name }}
 
-    - id: update-kustomization
-      name: Add claim to storage kustomization
-      action: roadiehq:utils:merge
-      input:
-        path: ./my-app/gitops/clusters/crossplane/storage/kustomization.yaml
-        content:
-          resources:
-            - ${{ parameters.name }}-claim.yaml
-        mergeArrays: true
+    # - id: update-kustomization
+    #   name: Add claim to storage kustomization
+    #   action: roadiehq:utils:merge
+    #   input:
+    #     path: ./my-app/gitops/clusters/crossplane/storage/kustomization.yaml
+    #     content:
+    #       resources:
+    #         - ${{ parameters.name }}-claim.yaml
+    #     mergeArrays: true
 
     - id: push-to-github
       name: Create PR to provision Storage Account

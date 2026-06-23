@@ -12,7 +12,7 @@ spec:
     directory:
       recurse: false
   destination:
-    server: gitops-aks
+    name: gitops-aks
     namespace: workload
   syncPolicy:
     automated:

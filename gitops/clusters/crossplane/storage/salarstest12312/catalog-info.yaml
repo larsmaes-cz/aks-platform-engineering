@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: salarstest12312
+  description: Azure Storage Account provisioned via Crossplane
+  annotations:
+    backstage.io/managed-by-location: "file:./gitops/clusters/crossplane/storage/salarstest12312-claim.yaml"
+    backstage.io/delete-template: template:default/Delete-Storage-Account
+spec:
+  type: storage
+  owner: lars.maes@cz.nl
+  lifecycle: production

@@ -13,7 +13,7 @@ spec:
       recurse: false
   destination:
     server: gitops-aks
-    namespace: crossplane-system
+    namespace: workload
   syncPolicy:
     automated:
       prune: true

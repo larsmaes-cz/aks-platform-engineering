@@ -1,5 +1,5 @@
 resources:
   - base/cluster
   - base/storage
-  - storage
+  - storage-argo-application.yaml
   # - clusters/my-app-cluster

@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: storage-claims
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/larsmaes-cz/aks-platform-engineering.git
+    targetRevision: main
+    path: gitops/clusters/crossplane/storage
+    directory:
+      recurse: false
+  destination:
+    name: in-cluster
+    namespace: crossplane-system
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true

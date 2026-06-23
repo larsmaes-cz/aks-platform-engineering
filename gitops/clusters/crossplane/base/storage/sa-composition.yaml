@@ -42,19 +42,20 @@ spec:
           transforms:
             - type: string
               string:
-                type: Regexp
-                regexp:
-                  match: '[^a-z0-9]'
-                  group: 0
-                replace: ''
-            - type: string
-              string:
                 type: Convert
                 convert: ToLower
             - type: string
               string:
-                type: Truncate
-                truncate: 24
+                type: Regexp
+                regexp:
+                  match: '[^a-z0-9]'
+                replace: ''
+            - type: string
+              string:
+                type: Regexp
+                regexp:
+                  match: '^(.{0,24}).*$'
+                replace: '${1}'
         - type: PatchSet
           patchSetName: location-patch
         - type: PatchSet

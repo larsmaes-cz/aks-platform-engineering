@@ -47,19 +47,19 @@ spec:
         url: https://${{ (parameters.argoRepoUrl | parseRepoUrl).host }}/${{ (parameters.argoRepoUrl | parseRepoUrl).owner }}/${{ (parameters.argoRepoUrl | parseRepoUrl).repo }}.git
         targetPath: ./my-app
 
-    # - id: delete-claim
-    #   name: Delete Storage Account Claim
-    #   action: fs:delete
-    #   input:
-    #     files:
-    #       - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}-claim.yaml
+    - id: delete-claim
+      name: Delete Storage Account Claim
+      action: fs:delete
+      input:
+        files:
+          - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}-claim.yaml
 
-    # - id: delete-catalog-info
-    #   name: Delete catalog-info for storage account
-    #   action: fs:delete
-    #   input:
-    #     files:
-    #       - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}/catalog-info.yaml
+    - id: delete-catalog-info
+      name: Delete catalog-info for storage account
+      action: fs:delete
+      input:
+        files:
+          - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}/catalog-info.yaml
 
     - id: update-kustomization
       name: Remove claim from storage kustomization
@@ -82,8 +82,8 @@ spec:
         branchName: backstage-delete-storage-${{ (parameters.entity | parseEntityRef).name }}
         update: true
         filesToDelete:
-          - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}-claim.yaml
-          - ./my-app/gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}/catalog-info.yaml
+          - gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}-claim.yaml
+          - gitops/clusters/crossplane/storage/${{ (parameters.entity | parseEntityRef).name }}/catalog-info.yaml
 
   output:
     links:

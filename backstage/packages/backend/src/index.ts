@@ -73,4 +73,7 @@ backend.add(import('@backstage-community/plugin-argocd-backend'));
 // roadie scaffolder utils
 backend.add(import('@roadiehq/scaffolder-backend-module-utils'));
 
+//Github Catalog
+backend.add(import('@backstage/plugin-catalog-backend-module-github'));
+
 backend.start();

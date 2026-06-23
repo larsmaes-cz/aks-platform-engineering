@@ -5,6 +5,11 @@ metadata:
   namespace: argocd
 spec:
   project: default
+  generators:
+  - clusters:
+      selector:
+        matchLabels:
+          environment: control-plane
   source:
     repoURL: https://github.com/larsmaes-cz/aks-platform-engineering.git
     targetRevision: main

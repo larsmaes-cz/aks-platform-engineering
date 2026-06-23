@@ -1,0 +1,25 @@
+apiVersion: storage.example.com/v1alpha1
+kind: StorageAccountClaim
+metadata:
+  name: salarsteat556677
+  namespace: crossplane-system
+spec:
+  location: westeurope
+  resourceGroupName: rg-lars-test-sa223344
+  storageAccount:
+    accountTier: Standard
+    accountReplicationType: LRS
+    accountKind: StorageV2
+    accessTier: Hot
+    minTlsVersion: TLS1_2
+    httpsTrafficOnlyEnabled: true
+    allowBlobPublicAccess: false
+    tags:
+      omgeving: ontw
+      eigenaar: Lars Maes
+      contact: lars.maes@cz.nl
+      divisie: it en data
+      afdeling: tech enablement
+      team: ACE
+      keten: IP
+      applicatie: Platform

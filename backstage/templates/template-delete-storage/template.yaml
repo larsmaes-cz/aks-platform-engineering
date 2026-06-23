@@ -6,7 +6,7 @@ metadata:
   description: This template removes a Storage Account claim, triggering Crossplane to delete the Azure resource.
 spec:
   owner: lars.maes@cz.nl
-  type: service
+  type: storage
 
   parameters:
     - title: Storage Account to Delete

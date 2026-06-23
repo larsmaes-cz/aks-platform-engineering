@@ -101,6 +101,15 @@ catalog:
         schedule:
           frequency: { minutes: 5 }
           timeout: { minutes: 3 }
+      gitops:
+        organization: 'larsmaes-cz'
+        catalogPath: '/gitops/**/catalog-info.yaml'
+        filters:
+          repository: 'aks-platform-engineering'
+          branch: 'main'
+        schedule:
+          frequency: { minutes: 5 }
+          timeout: { minutes: 3 }
   rules:
     - allow: [Component, API, Location, Template, Resource]
   locations:
